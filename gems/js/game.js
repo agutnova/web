@@ -128,11 +128,9 @@ $(document).ready(function(){
 			break;
 			case "delete":
 				fallGems();
-				checkMoving();
 			break;
 			case "filling":
 				genNewGems();
-				checkMoving();
 			break;
 		}
 	}
@@ -157,7 +155,11 @@ $(document).ready(function(){
 			gameStatus="delete";
 			console.log(gameStatus);
 			fallGems();
-		} 
+		} else {
+			gameStatus="pick";
+			selectedCol=-1;
+			selectedRow=-1;
+		}
 	}
 	
 	function fallGems() {
@@ -172,6 +174,7 @@ $(document).ready(function(){
 		}
 		gameStatus="filling";
 		console.log(gameStatus);
+		checkMoving();
 	}
 	
 	function deleteGems(row, col) {
