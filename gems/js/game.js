@@ -8,7 +8,8 @@ $(document).ready(function(){
 	let currentCol = -1;
 	let gems=new Array();
 	let gameStatus="pick";
-	
+	let countMoving=0;
+		
 	let colors=new Array(
 		"red",
 		"blue",
@@ -102,36 +103,40 @@ $(document).ready(function(){
 	}
 	
 	function checkMoving() {
-		switch (gameStatus) {
-			case "switch":
-			case "reverse":
-				if (!isThree(currentRow, currentCol) && !isThree(selectedRow, selectedCol)) 
-				{
-					if (gameStatus!="reverse") {
-						gameStatus="reverse";
-						console.log(gameStatus);
-						switchGems();
-						checkMoving();
+		if (countMoving>0) countMoving--;
+		console.log(countMoving);
+		if (countMoving==0) {
+			switch (gameStatus) {
+				case "switch":
+				case "reverse":
+					if (!isThree(currentRow, currentCol) && !isThree(selectedRow, selectedCol)) 
+					{
+						if (gameStatus!="reverse") {
+							gameStatus="reverse";
+							console.log(gameStatus);
+							switchGems();
+							checkMoving();
+						} else {
+							gameStatus="pick";
+							console.log(gameStatus);
+							selectedCol=-1;
+							selectedRow=-1;
+						}
 					} else {
-						gameStatus="pick";
+						gameStatus="delete";
 						console.log(gameStatus);
-						selectedCol=-1;
-						selectedRow=-1;
+						if (isThree(currentRow,currentCol)) deleteGems(currentRow,currentCol);
+						if (isThree(selectedRow,selectedCol)) deleteGems(selectedRow,selectedCol);
+						checkMoving();
 					}
-				} else {
-					gameStatus="delete";
-					console.log(gameStatus);
-					if (isThree(currentRow,currentCol)) deleteGems(currentRow,currentCol);
-					if (isThree(selectedRow,selectedCol)) deleteGems(selectedRow,selectedCol);
-					checkMoving();
-				}
-			break;
-			case "delete":
-				fallGems();
-			break;
-			case "filling":
-				genNewGems();
-			break;
+				break;
+				case "delete":
+					fallGems();
+				break;
+				case "filling":
+					genNewGems();
+				break;
+			}
 		}
 	}
 	
@@ -156,10 +161,27 @@ $(document).ready(function(){
 			console.log(gameStatus);
 			fallGems();
 		} else {
-			gameStatus="pick";
-			selectedCol=-1;
-			selectedRow=-1;
-		}
+			let r3=-1;
+			let c3=-1;
+			for(i=0;i<numRows;i++)
+				for (j=0;j<numCols;j++) {
+					if (isThree(i,j)) {
+						r3=i;
+						c3=j;
+						i=numRows; j=numCols;
+					}
+				}
+			if (r3>=0) {
+				gameStatus="delete";
+				console.log(gameStatus);
+				deleteGems(r3,c3);
+				checkMoving();
+			} else {
+				gameStatus="pick";
+				selectedCol=-1;
+				selectedRow=-1;
+			}
+		}		
 	}
 	
 	function fallGems() {
@@ -168,6 +190,7 @@ $(document).ready(function(){
 				if (gems[i][j]==-1 && gems[i-1][j]>=0) {
 					gems[i][j]=gems[i-1][j];
 					gems[i-1][j]=-1;
+					$("#cells_"+(i-1)+"_"+j).css({"background-color": "black"});
 					$("#cells_"+i+"_"+j).css({"background-color": colors[gems[i][j]]});
 				}
 			}
@@ -183,12 +206,14 @@ $(document).ready(function(){
 		if (isVertThree(row, col)) {
 			while (tmp>0 && gems[tmp-1][col]==c) {
 				gems[tmp-1][col]=-1;
+				$("#cells_"+(tmp-1)+"_"+col).css({"background-color": "black"});
 				tmp--;
 			}
 			tmp=row;
 			while (tmp<numRows-1 && gems[tmp+1][col]==c)
 			{
 				gems[tmp+1][col]=-1;
+				$("#cells_"+(tmp+1)+"_"+col).css({"background-color": "black"});
 				tmp++;
 			}
 		}
@@ -196,25 +221,47 @@ $(document).ready(function(){
 			tmp=col;
 			while (tmp>0 && gems[row][tmp-1]==c) {
 				gems[row][tmp-1]=-1;
+				$("#cells_"+row+"_"+(tmp-1)).css({"background-color": "black"});
 				tmp--;
 			}
 			tmp=col;
 			while(tmp<numCols-1 && gems[row][tmp+1]==c)
 			{
 				gems[row][tmp+1]=-1;
+				$("#cells_"+row+"_"+(tmp+1)).css({"background-color": "black"});
 				tmp++;
 			}
 		}
 		gems[row][col]=-1;
+		$("#cells_"+row+"_"+col).css({"background-color": "black"});
 	}
 	
 	function switchGems()
 	{
+		let x=selectedCol-currentCol;
+		let y=selectedRow-currentRow;
+		$("#cells_"+selectedRow+"_"+selectedCol).addClass("switch").attr("dir", -1);
+		$("#cells_"+currentRow+"_"+currentCol).addClass("switch").attr("dir", 1);
+		
+		$.each($(".switch"), function() {
+			countMoving++;
+			$(this).animate({
+				left: "+=" + x*cellSize*$(this).attr("dir"),
+				top: "+=" + y*cellSize*$(this).attr("dir")				
+			},{
+				duration: 500,
+				complete: function() {
+					checkMoving();
+				}
+			}).removeClass("switch");		
+		})
+		
 		let tmp=gems[currentRow][currentCol];
 		gems[currentRow][currentCol] = gems[selectedRow][selectedCol];
 		gems[selectedRow][selectedCol] = tmp;
-		$("#cells_"+currentRow+"_"+currentCol).css({"background-color": colors[gems[currentRow][currentCol]]});
-		$("#cells_"+selectedRow+"_"+selectedCol).css({"background-color": colors[gems[selectedRow][selectedCol]]});
+		$("#cells_"+selectedRow+"_"+selectedCol).attr("id", "tmp");
+		$("#cells_"+currentRow+"_"+currentCol).attr("id", "cells_"+selectedRow+"_"+selectedCol);
+		$("#tmp").attr("id","cells_"+currentRow+"_"+currentCol);
 	}
 	
 	function isThree(i,j) 
@@ -225,7 +272,7 @@ $(document).ready(function(){
 	function isVertThree(i,j)
 	{
 		let k=1;
-		let tmp=i;
+		let tmp=i;//0
 		while (tmp>0 && gems[tmp-1][j]==gems[i][j]) {
 			k++;
 			tmp--;
