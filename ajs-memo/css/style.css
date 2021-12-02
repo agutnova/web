@@ -1,0 +1,21 @@
+ body{
+	margin: 0px; 
+}
+
+main {
+	width: 600px;
+	height: 310px;
+}
+
+.wrapper {
+	width: 100vw;
+	text-align: center;
+}
+
+.card {
+	float: left;
+	margin-right: 15px;
+}
+.transparent {
+	opacity: 0;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html ng-app="MemoApp" ng-controller="MemoController">
+<head>
+	<title>Memo-game</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="wrapper">
+	<main>
+		<div class="card" ng-repeat="Card in Cards" ng-click="CardClick(Card.Id)">
+			<img ng-if="Card.Id>0" src="images/card.png" width="100px" id="card_{{Card.Id}}">
+		</div>
+	</main>
+</div>
+<script>
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+angular.module("MemoApp", []).controller("MemoController", function($scope) {
+	let img1 = 0;
+	let transparent_cards = 0;
+	
+	function start() {
+		for (i=1;i<6;i++) {
+			$scope.Cards[i] = {Id:i, Side:"back", Img:i};
+			$scope.Cards[i+5] = {Id:(i+5), Side:"back", Img:i};
+			if (transparent_cards>0) {
+				document.getElementById("card_"+i).classList.remove("transparent");
+				document.getElementById("card_"+i).src = "images/card.png";
+				document.getElementById("card_"+(i+5)).classList.remove("transparent");
+				document.getElementById("card_"+(i+5)).src = "images/card.png";
+			}
+		}
+		for(i=1;i<11;i++) {
+			n=Math.floor(Math.random()*10+1);
+			tmp = $scope.Cards[i].Img;
+			$scope.Cards[i].Img = $scope.Cards[n].Img;
+			$scope.Cards[n].Img = tmp;
+		}
+		transparent_cards=0;
+		img1=0;
+	}
+
+	$scope.Cards = [];
+	start();
+
+	$scope.CardClick = async function(Id) {
+		if ($scope.Cards[Id].Side=="back") {
+			document.getElementById("card_"+Id).src = "images/"+$scope.Cards[Id].Img+".png";
+			$scope.Cards[Id].Side = "front";
+			if (img1==0) img1=Id;
+			else {
+				await delay(600);
+				if ($scope.Cards[img1].Img == $scope.Cards[Id].Img) {
+					document.getElementById("card_"+Id).classList.add("transparent");
+					document.getElementById("card_"+img1).classList.add("transparent");
+					transparent_cards+=2;
+					if (transparent_cards==10) {
+						if(confirm("Вы выиграли!!! Хотите еще раз сыграть?")){
+							start();
+						};
+					}
+				} else {
+					document.getElementById("card_"+Id).src = "images/card.png";
+					$scope.Cards[Id].Side = "back";
+					document.getElementById("card_"+img1).src = "images/card.png";
+					$scope.Cards[img1].Side = "back";
+				}
+				img1=0;
+			}
+		}
+	}
+});
+</script>
+</body>
+</html>
