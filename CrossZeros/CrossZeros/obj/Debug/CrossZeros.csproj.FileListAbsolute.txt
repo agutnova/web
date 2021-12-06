@@ -1,0 +1,9 @@
+D:\AK\CrossZeros\CrossZeros\bin\Debug\CrossZeros.exe.config
+D:\AK\CrossZeros\CrossZeros\bin\Debug\CrossZeros.exe
+D:\AK\CrossZeros\CrossZeros\bin\Debug\CrossZeros.pdb
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.csprojAssemblyReference.cache
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.Form1.resources
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.Properties.Resources.resources
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.csproj.GenerateResource.cache
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.exe
+D:\AK\CrossZeros\CrossZeros\obj\Debug\CrossZeros.pdb
