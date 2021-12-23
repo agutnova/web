@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html ng-app="FrogsApp" ng-controller="FrogsController">
+<head>
+	<title>Лягушка - игра</title>
+	<meta charset="utf-8">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="js/functions.js"></script>
+</head>
+<body>
+	<div class="gameField" ng-repeat="item in frogs">
+		<img ng-src="{{item.image}}" id="frog_{{item.id}}" 
+		     ng-click="Jump(item.id)">
+	</div>
+</body>
+</html>
