@@ -1,0 +1,23 @@
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+.field {
+	position: relative;
+	left: calc(50% - 400px);
+	width: 800px;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.fon {
+	width: 100%;
+}
+
+.car {
+	position: absolute;
+	top: calc(100vh - 110px);
+	left: calc(50% - 25px);
+	height: 110px;
+}
